@@ -331,168 +331,305 @@
   function drawFaucet(ctx, w, h, raw, flow, time) {
     const scale = Math.min(w, h);
     const cx = w * 0.50;
-    const sinkY = h * 0.77;
-    const sinkW = clamp(w * 0.62, scale * 0.72, scale * 1.05);
+    const sinkY = h * 0.78;
+    const sinkW = clamp(w * 0.64, scale * 0.76, scale * 1.08);
     const sinkH = scale * 0.22;
-    const baseX = cx - scale * 0.13;
-    const baseY = h * 0.61;
-    const topY = h * 0.26;
-    const spoutX = cx + scale * 0.18;
-    const spoutY = h * 0.43;
-    const pipeWidth = clamp(scale * 0.058, 18, 32);
-    const openingX = spoutX + pipeWidth * 0.62;
-    const openingY = spoutY + pipeWidth * 0.58;
+
+    const pipeWidth = clamp(scale * 0.070, 24, 44);
+    const radius = pipeWidth * 1.18;
+    const valveX = cx - scale * 0.04;
+    const valveY = h * 0.355;
+    const wallX = cx + scale * 0.255;
+    const topY = -pipeWidth * 0.55;
+    const spoutLeftX = valveX - scale * 0.265;
+    const downEndY = valveY + scale * 0.205;
+    const openingX = spoutLeftX;
+    const openingY = downEndY + pipeWidth * 0.50;
+
+    const handlePivotX = valveX;
+    const handlePivotY = valveY - pipeWidth * 1.63;
+    const stemTopY = valveY - pipeWidth * 0.98;
+    const handleLength = clamp(scale * 0.205, 72, 132);
+    const minAngle = -0.08;
+    const maxAngle = 0.92;
+    const angle = lerp(minAngle, maxAngle, raw);
 
     drawSink(ctx, cx, sinkY, sinkW, sinkH, flow, time);
 
+    function pipePath() {
+      ctx.beginPath();
+      ctx.moveTo(wallX, topY);
+      ctx.lineTo(wallX, valveY - radius);
+      ctx.quadraticCurveTo(wallX, valveY, wallX - radius, valveY);
+      ctx.lineTo(valveX + pipeWidth * 0.98, valveY);
+      ctx.moveTo(valveX - pipeWidth * 0.98, valveY);
+      ctx.lineTo(spoutLeftX + radius * 0.70, valveY);
+      ctx.quadraticCurveTo(spoutLeftX, valveY, spoutLeftX, valveY + radius * 0.70);
+      ctx.lineTo(spoutLeftX, downEndY);
+    }
+
+    function strokePipe(width, style, alpha = 1, shadow = false) {
+      ctx.save();
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = style;
+      if (shadow) {
+        ctx.shadowColor = "rgba(0,0,0,0.58)";
+        ctx.shadowBlur = 32;
+        ctx.shadowOffsetY = 16;
+      }
+      pipePath();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.save();
+
+    const chrome = ctx.createLinearGradient(spoutLeftX - pipeWidth, topY, wallX + pipeWidth, downEndY + pipeWidth);
+    chrome.addColorStop(0.00, "#4e5a68");
+    chrome.addColorStop(0.09, "#dfe5ec");
+    chrome.addColorStop(0.18, "#a8b1bf");
+    chrome.addColorStop(0.30, "#f8fafc");
+    chrome.addColorStop(0.46, "#8f9aaa");
+    chrome.addColorStop(0.63, "#c7d0da");
+    chrome.addColorStop(0.80, "#5f6d7d");
+    chrome.addColorStop(1.00, "#202a38");
+
+    const darkEdge = ctx.createLinearGradient(spoutLeftX, topY, wallX, downEndY);
+    darkEdge.addColorStop(0, "rgba(19,27,39,0.92)");
+    darkEdge.addColorStop(0.52, "rgba(74,86,102,0.58)");
+    darkEdge.addColorStop(1, "rgba(7,12,20,0.94)");
+
+    strokePipe(pipeWidth + 7, "rgba(0,0,0,0.30)", 1, true);
+    strokePipe(pipeWidth + 2, darkEdge, 1, false);
+    strokePipe(pipeWidth, chrome, 1, false);
+    strokePipe(pipeWidth * 0.46, "rgba(255,255,255,0.20)", 1, false);
+    strokePipe(pipeWidth * 0.18, "rgba(255,255,255,0.45)", 0.62, false);
+
+    const pipeSheen = ctx.createLinearGradient(spoutLeftX, valveY - pipeWidth, wallX, valveY + pipeWidth);
+    pipeSheen.addColorStop(0, "rgba(255,255,255,0)");
+    pipeSheen.addColorStop(0.4, "rgba(255,255,255,0.42)");
+    pipeSheen.addColorStop(1, "rgba(255,255,255,0)");
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-
-    ctx.shadowColor = "rgba(0,0,0,0.48)";
-    ctx.shadowBlur = 26;
-    ctx.shadowOffsetY = 14;
-
-    const chrome = ctx.createLinearGradient(baseX - pipeWidth, topY, spoutX + pipeWidth * 2, baseY);
-    chrome.addColorStop(0, "#202838");
-    chrome.addColorStop(0.16, "#718199");
-    chrome.addColorStop(0.34, "#d7dde8");
-    chrome.addColorStop(0.52, "#7a879b");
-    chrome.addColorStop(0.75, "#3b4659");
-    chrome.addColorStop(1, "#161d2b");
-
-    ctx.strokeStyle = chrome;
-    ctx.lineWidth = pipeWidth;
+    ctx.strokeStyle = pipeSheen;
+    ctx.lineWidth = Math.max(2, pipeWidth * 0.10);
     ctx.beginPath();
-    ctx.moveTo(baseX, baseY);
-    ctx.lineTo(baseX, topY + pipeWidth * 1.05);
-    ctx.bezierCurveTo(baseX, topY, baseX + scale * 0.10, topY - scale * 0.045, baseX + scale * 0.22, topY + scale * 0.018);
-    ctx.bezierCurveTo(spoutX + scale * 0.08, topY + scale * 0.075, spoutX + scale * 0.075, spoutY - scale * 0.035, spoutX, spoutY);
-    ctx.bezierCurveTo(spoutX + scale * 0.015, spoutY + scale * 0.03, spoutX + scale * 0.06, spoutY + scale * 0.04, openingX, openingY);
+    ctx.moveTo(wallX - pipeWidth * 0.23, topY + pipeWidth * 0.8);
+    ctx.lineTo(wallX - pipeWidth * 0.23, valveY - radius * 0.82);
+    ctx.quadraticCurveTo(wallX - pipeWidth * 0.23, valveY - pipeWidth * 0.15, wallX - radius * 0.95, valveY - pipeWidth * 0.15);
+    ctx.lineTo(valveX + pipeWidth * 1.15, valveY - pipeWidth * 0.15);
     ctx.stroke();
-
-    ctx.shadowColor = "transparent";
-    ctx.strokeStyle = "rgba(255,255,255,0.28)";
-    ctx.lineWidth = Math.max(1, pipeWidth * 0.12);
     ctx.beginPath();
-    ctx.moveTo(baseX - pipeWidth * 0.20, baseY - pipeWidth * 0.25);
-    ctx.lineTo(baseX - pipeWidth * 0.20, topY + pipeWidth * 1.2);
-    ctx.bezierCurveTo(baseX - pipeWidth * 0.2, topY + pipeWidth * 0.4, baseX + scale * 0.10, topY + scale * 0.02, baseX + scale * 0.20, topY + scale * 0.045);
+    ctx.moveTo(valveX - pipeWidth * 1.10, valveY - pipeWidth * 0.15);
+    ctx.lineTo(spoutLeftX + radius * 0.48, valveY - pipeWidth * 0.15);
+    ctx.quadraticCurveTo(spoutLeftX + pipeWidth * 0.18, valveY - pipeWidth * 0.15, spoutLeftX + pipeWidth * 0.15, valveY + radius * 0.55);
+    ctx.lineTo(spoutLeftX + pipeWidth * 0.15, downEndY - pipeWidth * 0.15);
     ctx.stroke();
+    ctx.restore();
 
-    const baseGrad = ctx.createLinearGradient(baseX - pipeWidth * 1.1, baseY - pipeWidth, baseX + pipeWidth * 1.3, baseY + pipeWidth * 1.5);
-    baseGrad.addColorStop(0, "#e6ebf4");
-    baseGrad.addColorStop(0.32, "#7f8ba1");
-    baseGrad.addColorStop(1, "#202838");
-    roundedRect(ctx, baseX - pipeWidth * 0.9, baseY - pipeWidth * 0.28, pipeWidth * 1.8, pipeWidth * 1.35, pipeWidth * 0.34);
-    ctx.fillStyle = baseGrad;
+    const flangeGrad = ctx.createRadialGradient(wallX - pipeWidth * 0.25, topY + pipeWidth * 0.62, 2, wallX, topY + pipeWidth * 0.55, pipeWidth * 0.95);
+    flangeGrad.addColorStop(0, "#ffffff");
+    flangeGrad.addColorStop(0.42, "#b8c2cf");
+    flangeGrad.addColorStop(1, "#293445");
+    ctx.beginPath();
+    ctx.ellipse(wallX, topY + pipeWidth * 0.55, pipeWidth * 0.72, pipeWidth * 0.28, 0, 0, Math.PI * 2);
+    ctx.fillStyle = flangeGrad;
     ctx.fill();
     ctx.strokeStyle = "rgba(255,255,255,0.22)";
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    const mouthGrad = ctx.createRadialGradient(openingX, openingY, 0, openingX, openingY, pipeWidth * 0.58);
-    mouthGrad.addColorStop(0, "rgba(0,0,0,0.80)");
-    mouthGrad.addColorStop(0.58, "rgba(12,16,24,0.78)");
-    mouthGrad.addColorStop(1, "rgba(210,220,235,0.45)");
-    ctx.beginPath();
-    ctx.ellipse(openingX, openingY, pipeWidth * 0.52, pipeWidth * 0.28, 0.18, 0, Math.PI * 2);
-    ctx.fillStyle = mouthGrad;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.18)";
-    ctx.stroke();
-
-    const pivotX = baseX + pipeWidth * 1.05;
-    const pivotY = baseY - pipeWidth * 1.35;
-    const leverLength = clamp(scale * 0.18, 52, 104);
-    const minAngle = -Math.PI * 0.48;
-    const maxAngle = -Math.PI * 0.08;
-    const angle = lerp(minAngle, maxAngle, raw);
-
+    const valveW = pipeWidth * 2.55;
+    const valveH = pipeWidth * 2.32;
+    const valveLeft = valveX - valveW / 2;
+    const valveTop = valveY - valveH * 0.46;
     ctx.save();
-    ctx.translate(pivotX, pivotY);
-    ctx.rotate(angle);
-
-    const handleGrad = ctx.createLinearGradient(0, -pipeWidth * 0.24, leverLength, pipeWidth * 0.24);
-    handleGrad.addColorStop(0, "#edf2fb");
-    handleGrad.addColorStop(0.44, "#aeb8ca");
-    handleGrad.addColorStop(1, "#5f6b7e");
-    roundedRect(ctx, -pipeWidth * 0.18, -pipeWidth * 0.19, leverLength, pipeWidth * 0.38, pipeWidth * 0.19);
-    ctx.fillStyle = handleGrad;
+    ctx.shadowColor = "rgba(0,0,0,0.48)";
+    ctx.shadowBlur = 22;
+    ctx.shadowOffsetY = 12;
+    roundedRect(ctx, valveLeft, valveTop, valveW, valveH, pipeWidth * 0.42);
+    const valveGrad = ctx.createLinearGradient(valveLeft, valveTop, valveLeft + valveW, valveTop + valveH);
+    valveGrad.addColorStop(0, "#eef3f8");
+    valveGrad.addColorStop(0.17, "#a7b1bf");
+    valveGrad.addColorStop(0.48, "#d9e0e8");
+    valveGrad.addColorStop(0.70, "#737f91");
+    valveGrad.addColorStop(1, "#273243");
+    ctx.fillStyle = valveGrad;
     ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.28)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    const knobX = leverLength;
-    const knobGrad = ctx.createRadialGradient(knobX - pipeWidth * 0.15, -pipeWidth * 0.12, 2, knobX, 0, pipeWidth * 0.55);
-    knobGrad.addColorStop(0, "#fff");
-    knobGrad.addColorStop(0.45, "#d7deea");
-    knobGrad.addColorStop(1, "#596476");
-    ctx.beginPath();
-    ctx.ellipse(knobX, 0, pipeWidth * 0.55, pipeWidth * 0.42, 0, 0, Math.PI * 2);
-    ctx.fillStyle = knobGrad;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(0,0,0,0.24)";
+    ctx.shadowColor = "transparent";
+    ctx.strokeStyle = "rgba(255,255,255,0.32)";
+    ctx.lineWidth = 1.2;
     ctx.stroke();
     ctx.restore();
 
+    const valveInner = ctx.createRadialGradient(valveX - pipeWidth * 0.25, valveY - pipeWidth * 0.35, 2, valveX, valveY, valveW * 0.55);
+    valveInner.addColorStop(0, "rgba(255,255,255,0.30)");
+    valveInner.addColorStop(0.48, "rgba(255,255,255,0.05)");
+    valveInner.addColorStop(1, "rgba(0,0,0,0.18)");
+    roundedRect(ctx, valveLeft + pipeWidth * 0.18, valveTop + pipeWidth * 0.16, valveW - pipeWidth * 0.36, valveH - pipeWidth * 0.34, pipeWidth * 0.34);
+    ctx.fillStyle = valveInner;
+    ctx.fill();
+
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    const stemGrad = ctx.createLinearGradient(handlePivotX - pipeWidth * 0.18, stemTopY, handlePivotX + pipeWidth * 0.18, handlePivotY);
+    stemGrad.addColorStop(0, "#f8fafc");
+    stemGrad.addColorStop(0.42, "#a6b0bd");
+    stemGrad.addColorStop(1, "#323d4f");
+    ctx.strokeStyle = "rgba(0,0,0,0.26)";
+    ctx.lineWidth = pipeWidth * 0.42;
     ctx.beginPath();
-    ctx.arc(pivotX, pivotY, pipeWidth * 0.48, 0, Math.PI * 2);
-    const pivotGrad = ctx.createRadialGradient(pivotX - 4, pivotY - 5, 1, pivotX, pivotY, pipeWidth * 0.56);
-    pivotGrad.addColorStop(0, "#fff");
-    pivotGrad.addColorStop(0.45, "#aeb8ca");
-    pivotGrad.addColorStop(1, "#2a3343");
+    ctx.moveTo(handlePivotX, stemTopY + pipeWidth * 0.16);
+    ctx.lineTo(handlePivotX, handlePivotY + pipeWidth * 0.04);
+    ctx.stroke();
+    ctx.strokeStyle = stemGrad;
+    ctx.lineWidth = pipeWidth * 0.34;
+    ctx.beginPath();
+    ctx.moveTo(handlePivotX, stemTopY + pipeWidth * 0.16);
+    ctx.lineTo(handlePivotX, handlePivotY + pipeWidth * 0.04);
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = Math.max(1.2, pipeWidth * 0.055);
+    ctx.beginPath();
+    ctx.moveTo(handlePivotX - pipeWidth * 0.07, stemTopY + pipeWidth * 0.22);
+    ctx.lineTo(handlePivotX - pipeWidth * 0.07, handlePivotY - pipeWidth * 0.08);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(handlePivotX, handlePivotY);
+    ctx.rotate(angle);
+    ctx.shadowColor = "rgba(0,0,0,0.42)";
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetY = 9;
+
+    const barW = handleLength;
+    const barH = pipeWidth * 0.45;
+    const handleGrad = ctx.createLinearGradient(-barW * 0.5, -barH, barW * 0.5, barH);
+    handleGrad.addColorStop(0, "#eef3f8");
+    handleGrad.addColorStop(0.24, "#aeb8c6");
+    handleGrad.addColorStop(0.52, "#f8fbff");
+    handleGrad.addColorStop(0.78, "#798698");
+    handleGrad.addColorStop(1, "#333f51");
+    roundedRect(ctx, -barW * 0.5, -barH * 0.46, barW, barH * 0.92, barH * 0.46);
+    ctx.fillStyle = handleGrad;
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.strokeStyle = "rgba(255,255,255,0.30)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    const knobR = pipeWidth * 0.61;
+    for (const side of [-1, 1]) {
+      const kx = side * barW * 0.50;
+      const knobGrad = ctx.createRadialGradient(kx - knobR * 0.22, -knobR * 0.25, 2, kx, 0, knobR);
+      knobGrad.addColorStop(0, "#ffffff");
+      knobGrad.addColorStop(0.38, "#dce3eb");
+      knobGrad.addColorStop(0.74, "#8d99aa");
+      knobGrad.addColorStop(1, "#303b4d");
+      ctx.beginPath();
+      ctx.ellipse(kx, 0, knobR, knobR * 0.86, 0, 0, Math.PI * 2);
+      ctx.fillStyle = knobGrad;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    const pivotGrad = ctx.createRadialGradient(handlePivotX - pipeWidth * 0.20, handlePivotY - pipeWidth * 0.22, 2, handlePivotX, handlePivotY, pipeWidth * 0.62);
+    pivotGrad.addColorStop(0, "#ffffff");
+    pivotGrad.addColorStop(0.42, "#c3ccd8");
+    pivotGrad.addColorStop(1, "#354154");
+    ctx.beginPath();
+    ctx.ellipse(handlePivotX, handlePivotY, pipeWidth * 0.54, pipeWidth * 0.48, 0, 0, Math.PI * 2);
     ctx.fillStyle = pivotGrad;
     ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.20)";
+    ctx.strokeStyle = "rgba(255,255,255,0.24)";
+    ctx.stroke();
+
+    const mouthGrad = ctx.createRadialGradient(openingX - pipeWidth * 0.05, openingY, 1, openingX, openingY, pipeWidth * 0.70);
+    mouthGrad.addColorStop(0, "rgba(3,7,12,0.94)");
+    mouthGrad.addColorStop(0.56, "rgba(11,17,26,0.88)");
+    mouthGrad.addColorStop(0.78, "rgba(95,109,128,0.70)");
+    mouthGrad.addColorStop(1, "rgba(235,242,250,0.62)");
+    ctx.beginPath();
+    ctx.ellipse(openingX, openingY, pipeWidth * 0.46, pipeWidth * 0.22, 0, 0, Math.PI * 2);
+    ctx.fillStyle = mouthGrad;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.24)";
+    ctx.lineWidth = 1.1;
     ctx.stroke();
 
     if (flow > 0.02) {
+      ctx.save();
       ctx.globalCompositeOperation = "lighter";
-      ctx.beginPath();
-      ctx.arc(pivotX, pivotY, pipeWidth * (0.65 + flow * 0.68), 0, Math.PI * 2);
-      const valveGlow = ctx.createRadialGradient(pivotX, pivotY, 0, pivotX, pivotY, pipeWidth * (1.35 + flow));
-      valveGlow.addColorStop(0, `rgba(167,139,250,${0.24 + flow * 0.25})`);
+      const valveGlow = ctx.createRadialGradient(handlePivotX, handlePivotY, 0, handlePivotX, handlePivotY, pipeWidth * (1.1 + flow * 1.5));
+      valveGlow.addColorStop(0, `rgba(167,139,250,${0.17 + flow * 0.28})`);
       valveGlow.addColorStop(1, "rgba(167,139,250,0)");
       ctx.fillStyle = valveGlow;
+      ctx.beginPath();
+      ctx.arc(handlePivotX, handlePivotY, pipeWidth * (1.1 + flow * 1.5), 0, Math.PI * 2);
       ctx.fill();
-      ctx.globalCompositeOperation = "source-over";
+      ctx.restore();
     }
 
     ctx.restore();
 
-    drawWaterStream(ctx, openingX, openingY + pipeWidth * 0.18, sinkY - sinkH * 0.05, flow, time, scale);
+    drawWaterStream(ctx, openingX, openingY + pipeWidth * 0.12, sinkY - sinkH * 0.08, flow, time, scale);
 
-    drawSmallCapsule(ctx, "handle = base current", pivotX + pipeWidth * 0.7, pivotY - pipeWidth * 1.35, {
+    ctx.save();
+    const lipGrad = ctx.createRadialGradient(openingX - pipeWidth * 0.05, openingY, 1, openingX, openingY, pipeWidth * 0.70);
+    lipGrad.addColorStop(0, "rgba(3,7,12,0.92)");
+    lipGrad.addColorStop(0.55, "rgba(10,16,25,0.86)");
+    lipGrad.addColorStop(0.80, "rgba(126,139,156,0.72)");
+    lipGrad.addColorStop(1, "rgba(238,244,250,0.60)");
+    ctx.beginPath();
+    ctx.ellipse(openingX, openingY, pipeWidth * 0.46, pipeWidth * 0.22, 0, 0, Math.PI * 2);
+    ctx.fillStyle = lipGrad;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.26)";
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+    ctx.restore();
+
+    drawSmallCapsule(ctx, "handle = base current", handlePivotX + pipeWidth * 0.28, handlePivotY - pipeWidth * 1.12, {
       bg: "rgba(167,139,250,0.12)",
       stroke: "rgba(167,139,250,0.30)",
       text: "rgba(221,214,254,0.92)"
     }, "center");
 
     const aperture = raw <= 0.025 ? "closed" : `${Math.round(flow * 100)}% open`;
-    drawSmallCapsule(ctx, aperture, openingX, openingY + pipeWidth * 1.55, {
+    drawSmallCapsule(ctx, aperture, openingX, openingY + pipeWidth * 1.12, {
       bg: "rgba(56,189,248,0.11)",
       stroke: "rgba(56,189,248,0.28)",
       text: "rgba(186,230,253,0.94)"
     }, "center");
 
+    const knobX = handlePivotX + Math.cos(angle) * handleLength * 0.50;
+    const knobY = handlePivotY + Math.sin(angle) * handleLength * 0.50;
+
     return {
       openingX,
-      openingY: openingY + pipeWidth * 0.18,
-      sinkY: sinkY - sinkH * 0.05,
+      openingY: openingY + pipeWidth * 0.12,
+      sinkY: sinkY - sinkH * 0.08,
       sinkBottom: sinkY + sinkH,
       scale,
       handle: {
-        pivotX,
-        pivotY,
-        length: leverLength,
+        pivotX: handlePivotX,
+        pivotY: handlePivotY,
+        length: handleLength,
         angle,
         minAngle,
         maxAngle,
-        knobX: pivotX + Math.cos(angle) * leverLength,
-        knobY: pivotY + Math.sin(angle) * leverLength,
-        hitRadius: Math.max(44, leverLength * 0.54)
+        knobX,
+        knobY,
+        hitRadius: Math.max(50, handleLength * 0.46)
       }
     };
   }
