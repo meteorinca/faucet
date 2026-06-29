@@ -1,0 +1,143 @@
+:root {
+    --bg-color: #0f111a;
+    --text-color: #ffffff;
+    --panel-bg: #1a1d2e;
+    --accent-water: #00e5ff;
+    --accent-base: #ff2a2a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    font-weight: 300;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: #8892b0;
+    font-size: 1.1rem;
+}
+
+.demo-container {
+    display: flex;
+    gap: 3rem;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.panel {
+    background-color: var(--panel-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    flex: 1;
+    min-width: 300px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.panel h2 {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    color: #a9b7c6;
+}
+
+.svg-container {
+    width: 100%;
+    max-width: 250px;
+}
+
+/* Enhancing the SVGs */
+#water-flow,
+#water-inlet {
+    filter: drop-shadow(0 0 8px var(--accent-water));
+    transition: width 0.1s, x 0.1s;
+}
+
+#main-flow {
+    filter: drop-shadow(0 0 12px var(--accent-water));
+}
+
+#base-flow {
+    filter: drop-shadow(0 0 8px var(--accent-base));
+}
+
+.controls {
+    background-color: var(--panel-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.controls label {
+    display: block;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+    margin-bottom: 1rem;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+/* Custom Slider Styling */
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: #2a2d45;
+    border-radius: 4px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: var(--text-color);
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.status-readout {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-water);
+}
