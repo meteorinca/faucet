@@ -3,378 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transistor Faucet Analogy — Interactive Demo</title>
+    <title>Transistor Faucet Analogy</title>
 
-    <!-- ==================== styles.css ==================== -->
     <style>
         :root {
-            --bg: #08090f;
-            --panel-bg: #0d0f17;
-            --border: #1a1d2e;
-            --text: #c8ccd8;
-            --text-dim: #6b7084;
-            --accent-water: #38bdf8;
-            --accent-water-glow: #7dd3fc;
-            --accent-electron: #f59e0b;
-            --accent-electron-glow: #fbbf24;
-            --accent-base: #a78bfa;
+            --bg: #0b0d14;
+            --panel-bg: #121520;
+            --border: #1f2335;
+            --text: #e2e4ec;
+            --text-dim: #8b92a5;
+            --accent-water: #0ea5e9;
+            --accent-water-glow: #38bdf8;
+            --accent-electron: #eab308;
+            --accent-electron-glow: #fde047;
+            --accent-base: #8b5cf6;
             --slider-track: #1e2132;
-            --slider-fill: linear-gradient(90deg, #1e2132, #38bdf8, #f59e0b);
-            --font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
-            --font-sans: 'Inter', 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-            --radius: 14px;
+            --font-mono: 'SF Mono', 'Fira Code', monospace;
+            --font-sans: 'Inter', system-ui, sans-serif;
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%; height: 100%; overflow: hidden;
+            background: var(--bg); font-family: var(--font-sans); color: var(--text);
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: var(--bg);
-            font-family: var(--font-sans);
-            color: var(--text);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        /* ── Layout ─────────────────────────── */
-        .app {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-        }
+        .app { display: flex; flex-direction: column; height: 100vh; }
 
         .header {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px 24px 8px;
-            gap: 10px;
-            pointer-events: none;
-            z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px; gap: 12px; z-index: 10;
         }
-        .header .logo-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+
+        .logo-dot {
+            width: 10px; height: 10px; border-radius: 50%;
             background: var(--accent-water);
-            box-shadow: 0 0 12px var(--accent-water-glow);
-            animation: logo-pulse 2s ease-in-out infinite;
-        }
-        @keyframes logo-pulse {
-            0%,
-            100% {
-                box-shadow: 0 0 8px var(--accent-water-glow);
-            }
-            50% {
-                box-shadow: 0 0 22px var(--accent-water-glow), 0 0 40px var(--accent-water);
-            }
-        }
-        .header h1 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            color: #e2e4ec;
-            white-space: nowrap;
-        }
-        .header .badge {
-            font-size: 0.7rem;
-            font-weight: 500;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--accent-base);
-            background: rgba(167, 139, 250, 0.1);
-            border: 1px solid rgba(167, 139, 250, 0.25);
-            padding: 4px 10px;
-            border-radius: 20px;
-            white-space: nowrap;
+            box-shadow: 0 0 15px var(--accent-water-glow);
+            animation: pulse 2s infinite alternate;
         }
 
-        /* ── Main panels ───────────────────── */
+        @keyframes pulse {
+            from { box-shadow: 0 0 10px var(--accent-water-glow); }
+            to { box-shadow: 0 0 25px var(--accent-water-glow), 0 0 10px white; }
+        }
+
+        .header h1 { font-size: 1.2rem; font-weight: 600; }
+        
+        .badge {
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+            color: var(--accent-base); background: rgba(139, 92, 246, 0.15);
+            padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
         .panels {
-            flex: 1;
-            display: flex;
-            gap: 1px;
-            background: var(--border);
-            min-height: 0;
-            position: relative;
+            flex: 1; display: flex; background: var(--border);
+            gap: 1px; position: relative;
         }
+
         .panel {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--panel-bg);
-            position: relative;
-            overflow: hidden;
-            min-width: 0;
+            flex: 1; position: relative; background: var(--panel-bg);
+            display: flex; justify-content: center; align-items: center;
         }
-        .panel canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
         .panel-label {
-            position: absolute;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.72rem;
-            font-weight: 500;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            pointer-events: none;
-            z-index: 5;
-            background: rgba(13, 15, 23, 0.75);
-            padding: 5px 14px;
-            border-radius: 20px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .panel .value-readout {
-            position: absolute;
-            bottom: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: var(--font-mono);
-            font-size: 0.78rem;
-            font-weight: 500;
-            letter-spacing: 0.02em;
-            pointer-events: none;
-            z-index: 5;
-            background: rgba(13, 15, 23, 0.8);
-            padding: 6px 16px;
-            border-radius: 20px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: color var(--transition);
-        }
-        .panel.water-panel .value-readout {
-            color: var(--accent-water-glow);
-        }
-        .panel.transistor-panel .value-readout {
-            color: var(--accent-electron-glow);
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+            color: var(--text-dim); background: rgba(18, 21, 32, 0.85);
+            padding: 6px 16px; border-radius: 20px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05); z-index: 5;
         }
 
-        /* ── Divider glow ──────────────────── */
+        .value-readout {
+            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+            font-family: var(--font-mono); font-size: 0.85rem; font-weight: 500;
+            background: rgba(18, 21, 32, 0.9); padding: 8px 20px; border-radius: 20px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); z-index: 5;
+        }
+
+        .water-panel .value-readout { color: var(--accent-water-glow); }
+        .transistor-panel .value-readout { color: var(--accent-electron-glow); }
+
         .divider-glow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 2px;
-            height: 60%;
-            border-radius: 1px;
-            background: transparent;
-            pointer-events: none;
-            z-index: 6;
-            transition: box-shadow var(--transition), background var(--transition);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 2px; height: 70%; transition: var(--transition); z-index: 6;
         }
+
         .divider-glow.active {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.5), 0 0 60px rgba(167, 139, 250, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
         }
 
-        /* ── Control bar ──────────────────── */
         .control-bar {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            padding: 16px 28px 22px;
-            background: var(--panel-bg);
-            border-top: 1px solid var(--border);
-            z-index: 10;
-            flex-wrap: wrap;
-        }
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .control-label {
-            font-size: 0.7rem;
-            font-weight: 500;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            white-space: nowrap;
-            min-width: 80px;
-            text-align: right;
-        }
-        .region-indicator {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            padding: 6px 14px;
-            border-radius: 18px;
-            min-width: 90px;
-            text-align: center;
-            transition: all var(--transition);
-            white-space: nowrap;
-        }
-        .region-indicator.cutoff {
-            background: rgba(107, 112, 132, 0.15);
-            color: #6b7084;
-            border: 1px solid rgba(107, 112, 132, 0.3);
-        }
-        .region-indicator.active {
-            background: rgba(56, 189, 248, 0.12);
-            color: #7dd3fc;
-            border: 1px solid rgba(56, 189, 248, 0.35);
-        }
-        .region-indicator.saturation {
-            background: rgba(245, 158, 11, 0.12);
-            color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            box-shadow: 0 0 18px rgba(245, 158, 11, 0.2);
+            display: flex; justify-content: center; align-items: center; gap: 30px;
+            padding: 24px; background: var(--panel-bg); border-top: 1px solid var(--border);
         }
 
-        /* ── Custom Slider ────────────────── */
-        .slider-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+        .control-label { font-size: 0.75rem; font-weight: 600; color: var(--text-dim); text-align: right; }
+
+        .slider-container { position: relative; width: 250px; }
+
         input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 200px;
-            height: 6px;
-            border-radius: 3px;
-            background: var(--slider-track);
-            outline: none;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #e2e4ec;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            cursor: grab;
-            box-shadow: 0 0 16px rgba(167, 139, 250, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5);
-            transition: all var(--transition);
-            position: relative;
-        }
-        input[type="range"]::-webkit-slider-thumb:active {
-            cursor: grabbing;
-            box-shadow: 0 0 28px rgba(167, 139, 250, 0.8), 0 6px 24px rgba(0, 0, 0, 0.6);
-            transform: scale(1.08);
-        }
-        input[type="range"]::-moz-range-thumb {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #e2e4ec;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            cursor: grab;
-            box-shadow: 0 0 16px rgba(167, 139, 250, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5);
-        }
-        .slider-ticks {
-            display: flex;
-            justify-content: space-between;
-            width: 200px;
-            position: absolute;
-            top: 22px;
-            left: 0;
-            pointer-events: none;
-            font-size: 0.55rem;
-            letter-spacing: 0.03em;
-            color: var(--text-dim);
+            -webkit-appearance: none; width: 100%; height: 8px;
+            border-radius: 4px; background: var(--slider-track); outline: none;
         }
 
-        /* ── Responsive ───────────────────── */
-        @media (max-width: 680px) {
-            .panels {
-                flex-direction: column;
-                gap: 1px;
-            }
-            .panel {
-                min-height: 200px;
-            }
-            .divider-glow {
-                width: 60%;
-                height: 2px;
-                top: 50%;
-            }
-            .control-bar {
-                padding: 10px 14px 14px;
-                gap: 10px;
-            }
-            input[type="range"] {
-                width: 140px;
-            }
-            .slider-ticks {
-                width: 140px;
-            }
-            .header h1 {
-                font-size: 0.9rem;
-            }
-            .header .badge {
-                font-size: 0.62rem;
-                padding: 3px 8px;
-            }
-            .panel-label {
-                font-size: 0.65rem;
-                top: 8px;
-                padding: 4px 10px;
-            }
-            .panel .value-readout {
-                font-size: 0.68rem;
-                bottom: 8px;
-                padding: 4px 12px;
-            }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%;
+            background: #fff; cursor: pointer; border: 3px solid var(--accent-base);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5); transition: transform 0.1s;
         }
-        @media (min-width: 1400px) {
-            input[type="range"] {
-                width: 300px;
-            }
-            .slider-ticks {
-                width: 300px;
-            }
+
+        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.15); }
+
+        .slider-ticks {
+            display: flex; justify-content: space-between; position: absolute;
+            top: 25px; width: 100%; font-size: 0.6rem; color: var(--text-dim); font-weight: 600;
+        }
+
+        .region-indicator {
+            font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600;
+            padding: 8px 16px; border-radius: 8px; width: 110px; text-align: center;
+        }
+
+        .region-indicator.cutoff { background: rgba(139, 146, 165, 0.1); color: #8b92a5; }
+        .region-indicator.active { background: rgba(14, 165, 233, 0.15); color: #38bdf8; }
+        .region-indicator.saturation { background: rgba(234, 179, 8, 0.15); color: #fde047; }
+
+        @media (max-width: 768px) {
+            .panels { flex-direction: column; }
+            .divider-glow { width: 70%; height: 2px; }
+            .control-bar { padding: 16px; flex-wrap: wrap; gap: 15px; }
         }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Header -->
         <div class="header">
             <div class="logo-dot"></div>
             <h1>Transistor · Faucet Analogy</h1>
             <span class="badge">Interactive</span>
         </div>
 
-        <!-- Panels -->
         <div class="panels" id="panelsContainer">
             <div class="panel water-panel" id="waterPanel">
                 <canvas id="faucetCanvas"></canvas>
-                <span class="panel-label">💧 Faucet (Analogy)</span>
+                <span class="panel-label">💧 Faucet</span>
                 <span class="value-readout" id="waterReadout">Flow: 0.0 L/s</span>
             </div>
             <div class="divider-glow" id="dividerGlow"></div>
@@ -385,1025 +163,164 @@
             </div>
         </div>
 
-        <!-- Control Bar -->
         <div class="control-bar">
             <span class="control-label">Base Current<br>(Handle)</span>
             <div class="slider-container">
-                <input type="range" id="baseSlider" min="0" max="1000" value="0" step="1">
+                <input type="range" id="baseSlider" min="0" max="1000" value="0">
                 <div class="slider-ticks">
-                    <span>OFF</span><span>ACTIVE</span><span>SAT</span>
+                    <span>CUTOFF</span><span>ACTIVE</span><span>SATURATION</span>
                 </div>
             </div>
             <span class="region-indicator cutoff" id="regionIndicator">CUTOFF</span>
         </div>
     </div>
 
-    <!-- ==================== app.js ==================== -->
     <script>
-        (function() {
-            // ─────────────────────────────────────
-            // DOM refs
-            // ─────────────────────────────────────
-            const faucetCanvas = document.getElementById('faucetCanvas');
-            const transistorCanvas = document.getElementById('transistorCanvas');
-            const faucetCtx = faucetCanvas.getContext('2d');
-            const transistorCtx = transistorCanvas.getContext('2d');
-            const baseSlider = document.getElementById('baseSlider');
-            const regionIndicator = document.getElementById('regionIndicator');
-            const dividerGlow = document.getElementById('dividerGlow');
-            const waterReadout = document.getElementById('waterReadout');
-            const transistorReadout = document.getElementById('transistorReadout');
-            const waterPanel = document.getElementById('waterPanel');
-            const transistorPanelEl = document.getElementById('transistorPanel');
+        const faucetCanvas = document.getElementById('faucetCanvas');
+        const transCanvas = document.getElementById('transistorCanvas');
+        const fCtx = faucetCanvas.getContext('2d');
+        const tCtx = transCanvas.getContext('2d');
+        
+        let slider = document.getElementById('baseSlider');
+        let dpr = Math.min(window.devicePixelRatio || 1, 2);
+        let fW, fH, tW, tH;
+        let flowVal = 0;
 
-            // ─────────────────────────────────────
-            // State
-            // ─────────────────────────────────────
-            let sliderValue = 0; // 0..1
-            let targetSliderValue = 0;
-            let dpr = Math.min(window.devicePixelRatio || 1, 2);
+        function resize() {
+            const fRect = faucetCanvas.parentElement.getBoundingClientRect();
+            fW = fRect.width; fH = fRect.height;
+            faucetCanvas.width = fW * dpr; faucetCanvas.height = fH * dpr;
+            fCtx.scale(dpr, dpr);
 
-            // ─────────────────────────────────────
-            // Resize / DPR handling
-            // ─────────────────────────────────────
-            function resizeCanvas(canvas, ctx, panelEl) {
-                const rect = panelEl.getBoundingClientRect();
-                const w = rect.width;
-                const h = rect.height;
-                canvas.width = w * dpr;
-                canvas.height = h * dpr;
-                canvas.style.width = w + 'px';
-                canvas.style.height = h + 'px';
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.scale(dpr, dpr);
-                return { w, h };
+            const tRect = transCanvas.parentElement.getBoundingClientRect();
+            tW = tRect.width; tH = tRect.height;
+            transCanvas.width = tW * dpr; transCanvas.height = tH * dpr;
+            tCtx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Smoother Water Physics
+        class Particle {
+            constructor() { this.alive = false; }
+            spawn(x, y, flow) {
+                this.x = x + (Math.random() - 0.5) * 10 * flow;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 15 * flow;
+                this.vy = 50 + flow * 300;
+                this.life = 1;
+                this.size = 2 + Math.random() * 3;
+                this.alive = true;
             }
-
-            let faucetW, faucetH, transistorW, transistorH;
-
-            function resizeAll() {
-                const fd = resizeCanvas(faucetCanvas, faucetCtx, waterPanel);
-                faucetW = fd.w;
-                faucetH = fd.h;
-                const td = resizeCanvas(transistorCanvas, transistorCtx, transistorPanelEl);
-                transistorW = td.w;
-                transistorH = td.h;
+            update(dt, flow) {
+                if(!this.alive) return;
+                this.vy += 600 * dt; // Gravity
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.life -= dt * 0.8;
+                if(this.life <= 0 || this.y > fH) this.alive = false;
             }
-
-            // ─────────────────────────────────────
-            // Particle classes
-            // ─────────────────────────────────────
-            class WaterParticle {
-                constructor() { this.reset(); }
-                reset() {
-                    this.x = 0;
-                    this.y = 0;
-                    this.vx = 0;
-                    this.vy = 0;
-                    this.life = 0;
-                    this.maxLife = 0;
-                    this.size = 0;
-                    this.alpha = 0;
-                    this.alive = false;
-                }
-                spawn(x, y, flowStrength) {
-                    this.x = x + (Math.random() - 0.5) * flowStrength * 18;
-                    this.y = y + Math.random() * 4;
-                    this.vx = (Math.random() - 0.5) * flowStrength * 40;
-                    this.vy = 60 + Math.random() * 200 * flowStrength + flowStrength * 300;
-                    this.maxLife = 1.2 + Math.random() * 1.0;
-                    this.life = this.maxLife;
-                    this.size = 1.5 + Math.random() * 3.5 * (0.4 + flowStrength * 0.6);
-                    this.alpha = 0.55 + Math.random() * 0.45;
-                    this.alive = true;
-                }
-                update(dt) {
-                    if (!this.alive) return;
-                    this.life -= dt;
-                    if (this.life <= 0) { this.alive = false; return; }
-                    this.vy += 420 * dt; // gravity
-                    this.x += this.vx * dt;
-                    this.y += this.vy * dt;
-                    this.vx *= 0.998;
-                }
-                draw(ctx, flowStrength) {
-                    if (!this.alive) return;
-                    const lifeRatio = Math.max(0, this.life / this.maxLife);
-                    const alpha = this.alpha * lifeRatio;
-                    const r = this.size * (0.7 + lifeRatio * 0.3);
-                    const hue = 195 + Math.random() * 15;
-                    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, r);
-                    grad.addColorStop(0, `rgba(180,230,255,${alpha})`);
-                    grad.addColorStop(0.4, `rgba(56,189,248,${alpha * 0.85})`);
-                    grad.addColorStop(1, `rgba(14,116,180,${alpha * 0.2})`);
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
-                    ctx.fillStyle = grad;
-                    ctx.fill();
-                    // tiny highlight
-                    ctx.beginPath();
-                    ctx.arc(this.x - r * 0.25, this.y - r * 0.25, r * 0.35, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255,255,255,${alpha * 0.55})`;
-                    ctx.fill();
-                }
+            draw(ctx) {
+                if(!this.alive) return;
+                ctx.fillStyle = `rgba(56, 189, 248, ${this.life})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
+        }
+        
+        const water = Array.from({length: 400}, () => new Particle());
 
-            class ElectronParticle {
-                constructor() { this.reset(); }
-                reset() {
-                    this.x = 0;
-                    this.y = 0;
-                    this.pathProgress = 0;
-                    this.speed = 0;
-                    this.size = 0;
-                    this.alpha = 0;
-                    this.alive = false;
-                    this.trailPositions = [];
-                }
-                spawn(pathProgress, speed, size) {
-                    this.pathProgress = pathProgress;
-                    this.speed = speed;
-                    this.size = size;
-                    this.alpha = 0.7 + Math.random() * 0.3;
-                    this.alive = true;
-                    this.trailPositions = [];
-                }
-                update(dt, getPointOnPath) {
-                    if (!this.alive) return;
-                    this.pathProgress += this.speed * dt;
-                    if (this.pathProgress > 1.05) { this.alive = false; return; }
-                    const pt = getPointOnPath(Math.min(1, this.pathProgress));
-                    this.trailPositions.push({ x: pt.x, y: pt.y, life: 0.25 });
-                    // update trail lives
-                    for (let i = this.trailPositions.length - 1; i >= 0; i--) {
-                        this.trailPositions[i].life -= dt;
-                        if (this.trailPositions[i].life <= 0) this.trailPositions.splice(i, 1);
-                    }
-                    if (this.trailPositions.length > 14) this.trailPositions.shift();
-                    this.x = pt.x;
-                    this.y = pt.y;
-                }
-                draw(ctx) {
-                    if (!this.alive) return;
-                    // draw trail
-                    for (let i = 0; i < this.trailPositions.length; i++) {
-                        const tp = this.trailPositions[i];
-                        const lifeRatio = Math.max(0, tp.life / 0.25);
-                        const r = this.size * 0.5 * lifeRatio;
-                        const alpha = this.alpha * 0.5 * lifeRatio;
-                        ctx.beginPath();
-                        ctx.arc(tp.x, tp.y, r, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(251,191,36,${alpha})`;
-                        ctx.fill();
-                    }
-                    // draw main dot
-                    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-                    grad.addColorStop(0, `rgba(255,240,200,${this.alpha})`);
-                    grad.addColorStop(0.35, `rgba(251,191,36,${this.alpha * 0.9})`);
-                    grad.addColorStop(1, `rgba(245,120,10,${this.alpha * 0.1})`);
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = grad;
-                    ctx.fill();
-                    // glow
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size * 2.2, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(251,191,36,${this.alpha * 0.18})`;
-                    ctx.fill();
-                }
-            }
+        function drawSleekFaucet(ctx, w, h, flow) {
+            const cx = w * 0.5;
+            const neckTop = h * 0.2;
+            const spoutY = h * 0.45;
+            const pipeW = w * 0.06;
+            
+            ctx.save();
+            // Gooseneck Pipe
+            ctx.strokeStyle = '#4a5568';
+            ctx.lineWidth = pipeW;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            ctx.beginPath();
+            ctx.moveTo(cx - w*0.1, h * 0.05);
+            ctx.lineTo(cx - w*0.1, neckTop);
+            ctx.quadraticCurveTo(cx - w*0.1, spoutY - h*0.05, cx, spoutY);
+            ctx.stroke();
 
-            // ─────────────────────────────────────
-            // Particle pools
-            // ─────────────────────────────────────
-            const MAX_WATER = 300;
-            const waterParticles = [];
-            for (let i = 0; i < MAX_WATER; i++) waterParticles.push(new WaterParticle());
-            let waterSpawnTimer = 0;
-            let waterSpawnInterval = 0.016;
+            // Valve & Handle
+            const handleAngle = -Math.PI / 2 + flow * (Math.PI / 2);
+            ctx.translate(cx - w*0.1, neckTop + h*0.05);
+            ctx.rotate(handleAngle);
+            
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(0, -pipeW*0.3, w*0.12, pipeW*0.6);
+            ctx.beginPath();
+            ctx.arc(w*0.12, 0, pipeW*0.5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.restore();
 
-            const MAX_ELECTRONS = 120;
-            const electronParticles = [];
-            for (let i = 0; i < MAX_ELECTRONS; i++) electronParticles.push(new ElectronParticle());
-            let electronSpawnTimer = 0;
-            let electronSpawnInterval = 0.025;
-
-            // ─────────────────────────────────────
-            // Faucet geometry (computed each frame)
-            // ─────────────────────────────────────
-            function getFaucetGeometry(w, h) {
-                const cx = w * 0.5;
-                const valveY = h * 0.28;
-                const pipeTopY = h * 0.04;
-                const pipeWidth = w * 0.08;
-                const valveRadius = w * 0.07;
-                const handleLength = w * 0.22;
-                const handleWidth = w * 0.025;
-                const spoutEndY = h * 0.48;
-                const spoutEndX = cx;
-                const spoutCurveCtrlY = valveY + (spoutEndY - valveY) * 0.55;
-                const spoutOpeningY = spoutEndY;
-                const basinY = h * 0.78;
-                const basinW = w * 0.55;
-                const basinH = h * 0.06;
-                return {
-                    cx,
-                    valveY,
-                    pipeTopY,
-                    pipeWidth,
-                    valveRadius,
-                    handleLength,
-                    handleWidth,
-                    spoutEndY,
-                    spoutEndX,
-                    spoutCurveCtrlY,
-                    spoutOpeningY,
-                    basinY,
-                    basinW,
-                    basinH,
-                    w,
-                    h
-                };
-            }
-
-            // ─────────────────────────────────────
-            // Transistor geometry
-            // ─────────────────────────────────────
-            function getTransistorGeometry(w, h) {
-                const cx = w * 0.5;
-                const cy = h * 0.44;
-                const bodyW = w * 0.18;
-                const bodyH = h * 0.38;
-                const baseX = cx - bodyW * 0.65;
-                const baseY = cy;
-                const collectorY = cy - bodyH * 0.5;
-                const emitterY = cy + bodyH * 0.5;
-                const nRegionH = bodyH * 0.35;
-                const pRegionH = bodyH * 0.18;
-                return { cx, cy, bodyW, bodyH, baseX, baseY, collectorY, emitterY, nRegionH, pRegionH, w, h };
-            }
-
-            // ─────────────────────────────────────
-            // Draw faucet
-            // ─────────────────────────────────────
-            function drawFaucet(ctx, w, h, flowStrength) {
-                const g = getFaucetGeometry(w, h);
-                const {
-                    cx,
-                    valveY,
-                    pipeTopY,
-                    pipeWidth,
-                    valveRadius,
-                    handleLength,
-                    handleWidth,
-                    spoutEndY,
-                    spoutEndX,
-                    spoutCurveCtrlY,
-                    spoutOpeningY,
-                    basinY,
-                    basinW,
-                    basinH
-                } = g;
-
-                const handleAngle = -Math.PI / 2 + flowStrength * Math.PI * 0.48; // closed=horizontal(-90°), open≈-4°
-
-                ctx.save();
-
-                // ── Supply pipe (top) ──────────
-                const pipeGrad = ctx.createLinearGradient(cx - pipeWidth / 2, 0, cx + pipeWidth / 2, 0);
-                pipeGrad.addColorStop(0, '#2a3040');
-                pipeGrad.addColorStop(0.3, '#4a5568');
-                pipeGrad.addColorStop(0.5, '#5a657a');
-                pipeGrad.addColorStop(0.7, '#4a5568');
-                pipeGrad.addColorStop(1, '#2a3040');
-                ctx.fillStyle = pipeGrad;
-                ctx.fillRect(cx - pipeWidth / 2, pipeTopY, pipeWidth, valveY - valveRadius - pipeTopY);
-
-                // pipe rim highlight
-                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-                ctx.lineWidth = 1.5;
+            // Basin (Sleek Ellipse)
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.ellipse(cx, h*0.8, w*0.25, h*0.08, 0, 0, Math.PI*2);
+            ctx.fill();
+            
+            // Pool
+            if(flow > 0) {
+                ctx.fillStyle = `rgba(14, 165, 233, ${0.4 + flow*0.4})`;
                 ctx.beginPath();
-                ctx.moveTo(cx - pipeWidth / 2, pipeTopY);
-                ctx.lineTo(cx - pipeWidth / 2, valveY - valveRadius);
-                ctx.moveTo(cx + pipeWidth / 2, pipeTopY);
-                ctx.lineTo(cx + pipeWidth / 2, valveY - valveRadius);
-                ctx.stroke();
-
-                // ── Valve body ──────────────────
-                const valveGrad = ctx.createRadialGradient(cx, valveY, valveRadius * 0.2, cx, valveY, valveRadius);
-                valveGrad.addColorStop(0, '#6b7a90');
-                valveGrad.addColorStop(0.55, '#3d4a5c');
-                valveGrad.addColorStop(1, '#1a1f2b');
-                ctx.beginPath();
-                ctx.arc(cx, valveY, valveRadius, 0, Math.PI * 2);
-                ctx.fillStyle = valveGrad;
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // valve inner ring
-                ctx.beginPath();
-                ctx.arc(cx, valveY, valveRadius * 0.55, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // ── Handle ──────────────────────
-                const handlePivotX = cx + valveRadius * 0.3;
-                const handlePivotY = valveY;
-                const hx1 = handlePivotX + Math.cos(handleAngle) * handleLength;
-                const hy1 = handlePivotY + Math.sin(handleAngle) * handleLength;
-                const hPerpX = -Math.sin(handleAngle);
-                const hPerpY = Math.cos(handleAngle);
-
-                ctx.save();
-                ctx.translate(handlePivotX, handlePivotY);
-                ctx.rotate(handleAngle);
-
-                // handle lever
-                const leverGrad = ctx.createLinearGradient(0, -handleWidth, 0, handleWidth);
-                leverGrad.addColorStop(0, '#e8eaef');
-                leverGrad.addColorStop(0.35, '#c4c9d4');
-                leverGrad.addColorStop(0.65, '#9aa0b0');
-                leverGrad.addColorStop(1, '#5a6070');
-                ctx.fillStyle = leverGrad;
-                ctx.beginPath();
-                ctx.roundRect(0, -handleWidth, handleLength, handleWidth * 2, handleWidth);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // handle knob at end
-                const knobGrad = ctx.createRadialGradient(handleLength, 0, handleWidth * 0.4, handleLength, 0, handleWidth *
-                    1.5);
-                knobGrad.addColorStop(0, '#ffffff');
-                knobGrad.addColorStop(0.5, '#d0d5de');
-                knobGrad.addColorStop(1, '#7a8090');
-                ctx.beginPath();
-                ctx.arc(handleLength, 0, handleWidth * 1.5, 0, Math.PI * 2);
-                ctx.fillStyle = knobGrad;
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                ctx.lineWidth = 0.8;
-                ctx.stroke();
-
-                ctx.restore();
-
-                // handle pivot pin
-                ctx.beginPath();
-                ctx.arc(handlePivotX, handlePivotY, handleWidth * 0.8, 0, Math.PI * 2);
-                ctx.fillStyle = '#3a4050';
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // ── Spout ───────────────────────
-                ctx.beginPath();
-                ctx.moveTo(cx, valveY + valveRadius);
-                ctx.bezierCurveTo(cx + pipeWidth * 0.3, spoutCurveCtrlY, spoutEndX + pipeWidth * 0.15, spoutCurveCtrlY,
-                    spoutEndX, spoutEndY);
-                ctx.lineTo(spoutEndX - pipeWidth * 0.5, spoutEndY);
-                ctx.bezierCurveTo(spoutEndX - pipeWidth * 0.35, spoutCurveCtrlY - pipeWidth * 0.1, cx - pipeWidth * 0.35,
-                    valveY + valveRadius + pipeWidth * 0.2, cx - pipeWidth * 0.3, valveY + valveRadius);
-                ctx.closePath();
-                const spoutGrad = ctx.createLinearGradient(cx - pipeWidth, 0, cx + pipeWidth, 0);
-                spoutGrad.addColorStop(0, '#2a3040');
-                spoutGrad.addColorStop(0.4, '#4e5a6e');
-                spoutGrad.addColorStop(0.6, '#4e5a6e');
-                spoutGrad.addColorStop(1, '#2a3040');
-                ctx.fillStyle = spoutGrad;
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-                ctx.lineWidth = 1.2;
-                ctx.stroke();
-
-                // spout opening highlight
-                ctx.beginPath();
-                ctx.arc(spoutEndX, spoutEndY, pipeWidth * 0.28, 0, Math.PI);
-                ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.fill();
-
-                // ── Basin ───────────────────────
-                const basinTopY = basinY;
-                ctx.beginPath();
-                ctx.moveTo(cx - basinW / 2, basinTopY);
-                ctx.lineTo(cx - basinW / 2 - basinW * 0.08, basinTopY + basinH);
-                ctx.lineTo(cx + basinW / 2 + basinW * 0.08, basinTopY + basinH);
-                ctx.lineTo(cx + basinW / 2, basinTopY);
-                ctx.closePath();
-                const basinGrad = ctx.createLinearGradient(0, basinTopY, 0, basinTopY + basinH);
-                basinGrad.addColorStop(0, 'rgba(30,40,55,0.7)');
-                basinGrad.addColorStop(1, 'rgba(20,28,38,0.9)');
-                ctx.fillStyle = basinGrad;
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-
-                // water in basin (if flowing)
-                if (flowStrength > 0.005) {
-                    const waterLevel = basinTopY + 3 + flowStrength * basinH * 0.7;
-                    ctx.beginPath();
-                    ctx.moveTo(cx - basinW / 2 + 4, basinTopY + 3);
-                    ctx.quadraticCurveTo(cx, waterLevel + Math.sin(Date.now() / 400) * 4 * flowStrength, cx + basinW / 2 - 4,
-                        basinTopY + 3);
-                    ctx.lineTo(cx + basinW / 2 - 6, basinTopY + basinH * 0.4);
-                    ctx.quadraticCurveTo(cx, waterLevel + basinH * 0.3, cx - basinW / 2 + 6, basinTopY + basinH * 0.4);
-                    ctx.closePath();
-                    const poolGrad = ctx.createLinearGradient(0, basinTopY, 0, basinTopY + basinH * 0.5);
-                    poolGrad.addColorStop(0, `rgba(56,189,248,${0.5 + flowStrength * 0.4})`);
-                    poolGrad.addColorStop(1, 'rgba(14,100,160,0.3)');
-                    ctx.fillStyle = poolGrad;
-                    ctx.fill();
-                }
-
-                // ── Spout opening (where water exits) ──
-                const openingX = spoutEndX;
-                const openingY = spoutEndY;
-                ctx.beginPath();
-                ctx.arc(openingX, openingY, pipeWidth * 0.22, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0,0,0,0.55)';
-                ctx.fill();
-
-                ctx.restore();
-
-                return { openingX: spoutEndX, openingY: spoutEndY, basinTopY: basinY, basinW, basinH, handlePivotX,
-                    handlePivotY, handleAngle, valveRadius, handleLength, valveY, cx };
-            }
-
-            // ─────────────────────────────────────
-            // Draw transistor
-            // ─────────────────────────────────────
-            function drawTransistor(ctx, w, h, flowStrength) {
-                const g = getTransistorGeometry(w, h);
-                const { cx, cy, bodyW, bodyH, baseX, baseY, collectorY, emitterY, nRegionH, pRegionH } = g;
-
-                ctx.save();
-
-                // ── Glow aura when active ───────
-                if (flowStrength > 0.01) {
-                    const glowGrad = ctx.createRadialGradient(cx, cy, bodyW * 0.5, cx, cy, bodyW * 1.6);
-                    glowGrad.addColorStop(0, `rgba(251,191,36,${flowStrength * 0.25})`);
-                    glowGrad.addColorStop(0.5, `rgba(245,158,11,${flowStrength * 0.12})`);
-                    glowGrad.addColorStop(1, 'rgba(245,120,10,0)');
-                    ctx.fillStyle = glowGrad;
-                    ctx.fillRect(cx - bodyW * 2, cy - bodyH, bodyW * 4, bodyH * 2.5);
-                }
-
-                // ── Semiconductor body ──────────
-                // N region top (collector)
-                const nTopY = collectorY;
-                const nTopH = nRegionH;
-                const bodyLeft = cx - bodyW / 2;
-                const bodyRight = cx + bodyW / 2;
-
-                // Collector N region
-                const nGrad1 = ctx.createLinearGradient(0, nTopY, 0, nTopY + nTopH);
-                nGrad1.addColorStop(0, '#1e3a5f');
-                nGrad1.addColorStop(0.5, '#2563aa');
-                nGrad1.addColorStop(1, '#1a4570');
-                ctx.fillStyle = nGrad1;
-                ctx.beginPath();
-                ctx.roundRect(bodyLeft, nTopY, bodyW, nTopH, [6, 6, 0, 0]);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // P region (base) - middle
-                const pY = nTopY + nTopH;
-                const pGrad = ctx.createLinearGradient(0, pY, 0, pY + pRegionH);
-                const pGlow = flowStrength;
-                pGrad.addColorStop(0, `rgba(${120 + pGlow * 80},${60 + pGlow * 40},${140 + pGlow * 60},1)`);
-                pGrad.addColorStop(0.5, `rgba(${150 + pGlow * 70},${80 + pGlow * 50},${170 + pGlow * 50},1)`);
-                pGrad.addColorStop(1, `rgba(${110 + pGlow * 60},${55 + pGlow * 35},${135 + pGlow * 55},1)`);
-                ctx.fillStyle = pGrad;
-                ctx.fillRect(bodyLeft, pY, bodyW, pRegionH);
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 0.8;
-                ctx.strokeRect(bodyLeft, pY, bodyW, pRegionH);
-
-                // P region glow when base is energized
-                if (flowStrength > 0.01) {
-                    const pGlowGrad = ctx.createRadialGradient(cx, pY + pRegionH / 2, bodyW * 0.2, cx, pY + pRegionH / 2,
-                        bodyW * 0.8);
-                    pGlowGrad.addColorStop(0, `rgba(251,191,36,${flowStrength * 0.55})`);
-                    pGlowGrad.addColorStop(1, 'rgba(251,191,36,0)');
-                    ctx.fillStyle = pGlowGrad;
-                    ctx.fillRect(bodyLeft - bodyW * 0.3, pY - bodyW * 0.2, bodyW * 1.6, pRegionH + bodyW * 0.4);
-                }
-
-                // N region bottom (emitter)
-                const nBotY = pY + pRegionH;
-                const nBotH = nRegionH;
-                const nGrad2 = ctx.createLinearGradient(0, nBotY, 0, nBotY + nBotH);
-                nGrad2.addColorStop(0, '#1a4570');
-                nGrad2.addColorStop(0.5, '#2563aa');
-                nGrad2.addColorStop(1, '#1e3a5f');
-                ctx.fillStyle = nGrad2;
-                ctx.beginPath();
-                ctx.roundRect(bodyLeft, nBotY, bodyW, nBotH, [0, 0, 6, 6]);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // ── Metal contacts ──────────────
-                // Collector contact (top)
-                ctx.fillStyle = '#c8ccd4';
-                ctx.fillRect(cx - bodyW * 0.15, collectorY - 10, bodyW * 0.3, 14);
-                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(cx - bodyW * 0.15, collectorY - 10, bodyW * 0.3, 14);
-                // wire up
-                ctx.beginPath();
-                ctx.moveTo(cx, collectorY - 10);
-                ctx.lineTo(cx, collectorY - 40);
-                ctx.strokeStyle = '#8899aa';
-                ctx.lineWidth = 2.5;
-                ctx.stroke();
-                // terminal dot
-                ctx.beginPath();
-                ctx.arc(cx, collectorY - 44, 5, 0, Math.PI * 2);
-                ctx.fillStyle = '#d0d5de';
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // Emitter contact (bottom)
-                ctx.fillStyle = '#c8ccd4';
-                ctx.fillRect(cx - bodyW * 0.15, emitterY - 4, bodyW * 0.3, 14);
-                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(cx - bodyW * 0.15, emitterY - 4, bodyW * 0.3, 14);
-                // wire down with arrow
-                ctx.beginPath();
-                ctx.moveTo(cx, emitterY + 10);
-                ctx.lineTo(cx, emitterY + 38);
-                ctx.strokeStyle = '#8899aa';
-                ctx.lineWidth = 2.5;
-                ctx.stroke();
-                // arrowhead (emitter arrow for NPN - points OUT, i.e. downward from base)
-                const arrowTipY = emitterY + 42;
-                ctx.beginPath();
-                ctx.moveTo(cx, arrowTipY);
-                ctx.lineTo(cx - 8, arrowTipY - 10);
-                ctx.lineTo(cx + 8, arrowTipY - 10);
-                ctx.closePath();
-                ctx.fillStyle = '#8899aa';
-                ctx.fill();
-
-                // Base contact (left side)
-                ctx.fillStyle = '#c8ccd4';
-                ctx.fillRect(baseX - 10, baseY - bodyW * 0.12, 14, bodyW * 0.24);
-                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(baseX - 10, baseY - bodyW * 0.12, 14, bodyW * 0.24);
-                // wire left
-                ctx.beginPath();
-                ctx.moveTo(baseX - 10, baseY);
-                ctx.lineTo(baseX - 38, baseY);
-                ctx.strokeStyle = '#8899aa';
-                ctx.lineWidth = 2.5;
-                ctx.stroke();
-                // terminal dot
-                ctx.beginPath();
-                ctx.arc(baseX - 42, baseY, 5, 0, Math.PI * 2);
-                ctx.fillStyle = '#d0d5de';
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // ── Labels ──────────────────────
-                ctx.fillStyle = '#8899aa';
-                ctx.font = '600 11px "Inter","SF Pro Display",system-ui,sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('C', cx, collectorY - 50);
-                ctx.fillText('E', cx, arrowTipY + 16);
-                ctx.textAlign = 'right';
-                ctx.fillText('B', baseX - 48, baseY + 4);
-
-                // ── Base current glow indicator ──
-                if (flowStrength > 0.01) {
-                    const baseGlowGrad = ctx.createRadialGradient(baseX - 38, baseY, 2, baseX - 38, baseY, 18 + flowStrength *
-                        20);
-                    baseGlowGrad.addColorStop(0, `rgba(167,139,250,${0.6 + flowStrength * 0.4})`);
-                    baseGlowGrad.addColorStop(1, 'rgba(167,139,250,0)');
-                    ctx.fillStyle = baseGlowGrad;
-                    ctx.beginPath();
-                    ctx.arc(baseX - 38, baseY, 18 + flowStrength * 20, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                ctx.restore();
-
-                // Return path info for electron particles
-                return {
-                    // Path: emitter -> up through body -> collector
-                    pathStartY: emitterY + 6,
-                    pathEndY: collectorY - 6,
-                    pathX: cx,
-                    bodyLeft,
-                    bodyRight,
-                    bodyW,
-                    pY,
-                    pRegionH,
-                    collectorY,
-                    emitterY,
-                    cx,
-                    cy,
-                    baseX,
-                    baseY
-                };
-            }
-
-            // ─────────────────────────────────────
-            // Get point on electron path
-            // ─────────────────────────────────────
-            function makeElectronPathGetter(tGeo) {
-                return function(progress) {
-                    // progress 0 = emitter, progress 1 = collector
-                    const y = tGeo.emitterY + 6 - progress * (tGeo.emitterY + 6 - tGeo.collectorY + 6);
-                    // slight S-curve through the body
-                    const xOffset = Math.sin(progress * Math.PI) * tGeo.bodyW * 0.22;
-                    return {
-                        x: tGeo.cx + xOffset,
-                        y: y
-                    };
-                };
-            }
-
-            // ─────────────────────────────────────
-            // Spawn particles
-            // ─────────────────────────────────────
-            function spawnWaterParticle(fGeom, flowStrength) {
-                for (const p of waterParticles) {
-                    if (!p.alive) {
-                        p.spawn(fGeom.openingX, fGeom.openingY, flowStrength);
-                        return;
-                    }
-                }
-            }
-
-            function spawnElectronParticle(tGeo, flowStrength, getPointOnPath) {
-                if (flowStrength < 0.008) return;
-                for (const p of electronParticles) {
-                    if (!p.alive) {
-                        const speed = 0.15 + flowStrength * 1.1 + Math.random() * flowStrength * 0.6;
-                        const size = 1.8 + Math.random() * 4.5 * (0.3 + flowStrength * 0.7);
-                        p.spawn(Math.random() * 0.04, speed, size);
-                        return;
-                    }
-                }
-            }
-
-            // ─────────────────────────────────────
-            // Draw connecting flow lines (subtle)
-            // ─────────────────────────────────────
-            function drawBaseConnectionGlow(ctx, tGeo, flowStrength) {
-                if (flowStrength < 0.02) return;
-                // Small pulsing dot on the base wire showing base current
-                const bx = tGeo.baseX - 38;
-                const by = tGeo.baseY;
-                const pulseR = 3 + Math.sin(Date.now() / 300) * 2 + flowStrength * 8;
-                const pulseAlpha = 0.4 + Math.sin(Date.now() / 250) * 0.3 + flowStrength * 0.3;
-                const grad = ctx.createRadialGradient(bx, by, 0, bx, by, pulseR);
-                grad.addColorStop(0, `rgba(167,139,250,${Math.min(1, pulseAlpha)})`);
-                grad.addColorStop(1, 'rgba(167,139,250,0)');
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.arc(bx, by, pulseR, 0, Math.PI * 2);
+                ctx.ellipse(cx, h*0.8, (w*0.23) * (0.5+flow*0.5), (h*0.06) * (0.5+flow*0.5), 0, 0, Math.PI*2);
                 ctx.fill();
             }
 
-            // ─────────────────────────────────────
-            // Main render
-            // ─────────────────────────────────────
-            let lastTime = performance.now();
-            let faucetGeom = null;
-            let transistorGeom = null;
-            let electronPathGetter = null;
+            return { x: cx, y: spoutY + pipeW/2 };
+        }
 
-            function render(timestamp) {
-                requestAnimationFrame(render);
+        let lastTime = performance.now();
+        
+        function render(now) {
+            let dt = (now - lastTime) / 1000;
+            lastTime = now;
+            if(dt > 0.1) dt = 0.1;
 
-                let dt = (timestamp - lastTime) / 1000;
-                if (dt <= 0) dt = 0.016;
-                if (dt > 0.1) dt = 0.1; // clamp large dt
-                lastTime = timestamp;
+            // Target smoothing
+            let targetFlow = slider.value / 1000;
+            flowVal += (targetFlow - flowVal) * 10 * dt;
 
-                // Smooth slider
-                sliderValue += (targetSliderValue - sliderValue) * Math.min(1, dt * 14);
-                if (Math.abs(targetSliderValue - sliderValue) < 0.0005) sliderValue = targetSliderValue;
+            // --- Faucet Render ---
+            fCtx.clearRect(0, 0, fW, fH);
+            let spout = drawSleekFaucet(fCtx, fW, fH, flowVal);
 
-                const flowStrength = sliderValue;
-
-                // Resize check
-                const waterRect = waterPanel.getBoundingClientRect();
-                const transRect = transistorPanelEl.getBoundingClientRect();
-                if (Math.abs(faucetW - waterRect.width) > 1 || Math.abs(faucetH - waterRect.height) > 1 ||
-                    Math.abs(transistorW - transRect.width) > 1 || Math.abs(transistorH - transRect.height) > 1) {
-                    resizeAll();
-                }
-
-                // ── Faucet canvas ───────────────
-                faucetCtx.clearRect(0, 0, faucetW, faucetH);
-                // subtle bg grid
-                faucetCtx.strokeStyle = 'rgba(255,255,255,0.015)';
-                faucetCtx.lineWidth = 0.5;
-                const gridSize = 30;
-                for (let gx = gridSize; gx < faucetW; gx += gridSize) {
-                    faucetCtx.beginPath();
-                    faucetCtx.moveTo(gx, 0);
-                    faucetCtx.lineTo(gx, faucetH);
-                    faucetCtx.stroke();
-                }
-                for (let gy = gridSize; gy < faucetH; gy += gridSize) {
-                    faucetCtx.beginPath();
-                    faucetCtx.moveTo(0, gy);
-                    faucetCtx.lineTo(faucetW, gy);
-                    faucetCtx.stroke();
-                }
-
-                faucetGeom = drawFaucet(faucetCtx, faucetW, faucetH, flowStrength);
-
-                // Spawn water
-                if (flowStrength > 0.004) {
-                    waterSpawnInterval = 0.018 / (0.3 + flowStrength * 1.2);
-                    waterSpawnTimer += dt;
-                    const particlesPerSpawn = Math.max(1, Math.floor(flowStrength * 5));
-                    while (waterSpawnTimer >= waterSpawnInterval && flowStrength > 0.004) {
-                        waterSpawnTimer -= waterSpawnInterval;
-                        for (let i = 0; i < particlesPerSpawn; i++) {
-                            spawnWaterParticle(faucetGeom, flowStrength);
-                        }
-                    }
-                } else {
-                    waterSpawnTimer = 0;
-                }
-
-                // Update & draw water particles
-                for (const p of waterParticles) {
-                    if (!p.alive) continue;
-                    p.update(dt);
-                    // kill if below basin or off screen
-                    if (p.y > faucetGeom.basinTopY + faucetGeom.basinH + 30 || p.y > faucetH + 40 || p.x < -40 || p.x >
-                        faucetW + 40) {
-                        p.alive = false;
-                    }
-                    // if in basin, slow down and fade
-                    if (p.y > faucetGeom.basinTopY && p.y < faucetGeom.basinTopY + faucetGeom.basinH + 10) {
-                        p.vy *= 0.7;
-                        p.vx *= 0.8;
-                        if (p.y > faucetGeom.basinTopY + faucetGeom.basinH * 0.6) {
-                            p.life -= dt * 2.5;
-                        }
-                    }
-                    p.draw(faucetCtx, flowStrength);
-                }
-
-                // water splash particles at basin surface
-                if (flowStrength > 0.03) {
-                    const splashCount = Math.floor(flowStrength * 3);
-                    for (let i = 0; i < splashCount; i++) {
-                        if (Math.random() < flowStrength * 0.6) {
-                            const sx = faucetGeom.openingX + (Math.random() - 0.5) * faucetGeom.basinW * 0.7;
-                            const sy = faucetGeom.basinTopY - Math.random() * 6;
-                            faucetCtx.beginPath();
-                            faucetCtx.arc(sx, sy, 1 + Math.random() * 2, 0, Math.PI * 2);
-                            faucetCtx.fillStyle =
-                                `rgba(180,230,255,${0.3 + Math.random() * 0.5 * flowStrength})`;
-                            faucetCtx.fill();
-                        }
-                    }
-                }
-
-                // ── Transistor canvas ───────────
-                transistorCtx.clearRect(0, 0, transistorW, transistorH);
-                // subtle bg grid
-                transistorCtx.strokeStyle = 'rgba(255,255,255,0.015)';
-                transistorCtx.lineWidth = 0.5;
-                for (let gx = gridSize; gx < transistorW; gx += gridSize) {
-                    transistorCtx.beginPath();
-                    transistorCtx.moveTo(gx, 0);
-                    transistorCtx.lineTo(gx, transistorH);
-                    transistorCtx.stroke();
-                }
-                for (let gy = gridSize; gy < transistorH; gy += gridSize) {
-                    transistorCtx.beginPath();
-                    transistorCtx.moveTo(0, gy);
-                    transistorCtx.lineTo(transistorW, gy);
-                    transistorCtx.stroke();
-                }
-
-                transistorGeom = drawTransistor(transistorCtx, transistorW, transistorH, flowStrength);
-                electronPathGetter = makeElectronPathGetter(transistorGeom);
-                drawBaseConnectionGlow(transistorCtx, transistorGeom, flowStrength);
-
-                // Spawn electrons
-                if (flowStrength > 0.006) {
-                    electronSpawnInterval = 0.028 / (0.2 + flowStrength * 1.5);
-                    electronSpawnTimer += dt;
-                    const ePerSpawn = Math.max(1, Math.floor(flowStrength * 3.5));
-                    while (electronSpawnTimer >= electronSpawnInterval && flowStrength > 0.006) {
-                        electronSpawnTimer -= electronSpawnInterval;
-                        for (let i = 0; i < ePerSpawn; i++) {
-                            spawnElectronParticle(transistorGeom, flowStrength, electronPathGetter);
-                        }
-                    }
-                } else {
-                    electronSpawnTimer = 0;
-                }
-
-                // Update & draw electrons
-                for (const p of electronParticles) {
-                    if (!p.alive) continue;
-                    p.update(dt, electronPathGetter);
-                    p.draw(transistorCtx);
-                }
-
-                // ── Update divider glow ─────────
-                if (flowStrength > 0.02) {
-                    dividerGlow.classList.add('active');
-                    dividerGlow.style.boxShadow =
-                        `0 0 ${18 + flowStrength * 40}px rgba(167,139,250,${0.3 + flowStrength * 0.5}), 0 0 ${50 + flowStrength * 60}px rgba(167,139,250,${0.1 + flowStrength * 0.3})`;
-                } else {
-                    dividerGlow.classList.remove('active');
-                    dividerGlow.style.boxShadow = 'none';
-                }
-
-                // ── Update readouts ─────────────
-                const waterFlow = flowStrength * 4.5; // L/s
-                const collectorCurrent = flowStrength * 12.0; // mA (amplified)
-                waterReadout.textContent = `Flow: ${waterFlow.toFixed(1)} L/s`;
-                transistorReadout.textContent = `Ic: ${collectorCurrent.toFixed(2)} mA`;
-
-                // ── Update region indicator ─────
-                regionIndicator.classList.remove('cutoff', 'active', 'saturation');
-                if (flowStrength < 0.015) {
-                    regionIndicator.textContent = 'CUTOFF';
-                    regionIndicator.classList.add('cutoff');
-                } else if (flowStrength < 0.75) {
-                    regionIndicator.textContent = 'ACTIVE';
-                    regionIndicator.classList.add('active');
-                } else {
-                    regionIndicator.textContent = 'SATURATION';
-                    regionIndicator.classList.add('saturation');
+            if(flowVal > 0.05) {
+                let spawnCount = Math.floor(flowVal * 10);
+                for(let i=0; i<spawnCount; i++) {
+                    let p = water.find(p => !p.alive);
+                    if(p) p.spawn(spout.x, spout.y, flowVal);
                 }
             }
 
-            // ─────────────────────────────────────
-            // Event handlers
-            // ─────────────────────────────────────
-            baseSlider.addEventListener('input', () => {
-                targetSliderValue = parseInt(baseSlider.value) / 1000;
-            });
-            baseSlider.addEventListener('change', () => {
-                targetSliderValue = parseInt(baseSlider.value) / 1000;
+            water.forEach(p => {
+                p.update(dt, flowVal);
+                p.draw(fCtx);
             });
 
-            // Touch on faucet handle to drag
-            function getFaucetHandlePos() {
-                if (!faucetGeom) return null;
-                const angle = -Math.PI / 2 + sliderValue * Math.PI * 0.48;
-                const hpx = faucetGeom.handlePivotX;
-                const hpy = faucetGeom.handlePivotY;
-                const knobX = hpx + Math.cos(angle) * faucetGeom.handleLength;
-                const knobY = hpy + Math.sin(angle) * faucetGeom.handleLength;
-                return { knobX, knobY, hpx, hpy, angle };
-            }
+            // Update UI Readouts
+            document.getElementById('waterReadout').innerText = `Flow: ${(flowVal * 5).toFixed(1)} L/s`;
+            document.getElementById('transistorReadout').innerText = `Ic: ${(flowVal * 15).toFixed(2)} mA`;
+            
+            let ind = document.getElementById('regionIndicator');
+            ind.className = 'region-indicator ' + (flowVal < 0.05 ? 'cutoff' : flowVal < 0.9 ? 'active' : 'saturation');
+            ind.innerText = flowVal < 0.05 ? 'CUTOFF' : flowVal < 0.9 ? 'ACTIVE' : 'SATURATION';
 
-            function handleFaucetInteraction(clientX, clientY) {
-                if (!faucetGeom) return false;
-                const rect = faucetCanvas.getBoundingClientRect();
-                const mx = clientX - rect.left;
-                const my = clientY - rect.top;
-                const hp = getFaucetHandlePos();
-                if (!hp) return false;
-                const distKnob = Math.hypot(mx - hp.knobX, my - hp.knobY);
-                const distPivot = Math.hypot(mx - hp.hpx, my - hp.hpy);
-                const handleHitRadius = faucetGeom.handleLength * 0.7;
-                if (distKnob < handleHitRadius * 0.7 || distPivot < handleHitRadius) {
-                    // Calculate desired angle from pivot
-                    const dx = mx - hp.hpx;
-                    const dy = my - hp.hpy;
-                    let desiredAngle = Math.atan2(dy, dx);
-                    // Clamp
-                    const minAngle = -Math.PI / 2;
-                    const maxAngle = -Math.PI / 2 + Math.PI * 0.48;
-                    desiredAngle = Math.max(minAngle, Math.min(maxAngle, desiredAngle));
-                    const newVal = (desiredAngle + Math.PI / 2) / (Math.PI * 0.48);
-                    targetSliderValue = Math.max(0, Math.min(1, newVal));
-                    baseSlider.value = Math.round(targetSliderValue * 1000);
-                    return true;
-                }
-                return false;
-            }
+            document.getElementById('dividerGlow').classList.toggle('active', flowVal > 0.1);
 
-            let isDraggingFaucet = false;
-
-            faucetCanvas.addEventListener('pointerdown', (e) => {
-                if (handleFaucetInteraction(e.clientX, e.clientY)) {
-                    isDraggingFaucet = true;
-                    faucetCanvas.setPointerCapture(e.pointerId);
-                    e.preventDefault();
-                }
-            });
-            faucetCanvas.addEventListener('pointermove', (e) => {
-                if (isDraggingFaucet) {
-                    handleFaucetInteraction(e.clientX, e.clientY);
-                    e.preventDefault();
-                } else {
-                    // hover cursor
-                    if (faucetGeom) {
-                        const rect = faucetCanvas.getBoundingClientRect();
-                        const mx = e.clientX - rect.left;
-                        const my = e.clientY - rect.top;
-                        const hp = getFaucetHandlePos();
-                        if (hp) {
-                            const distKnob = Math.hypot(mx - hp.knobX, my - hp.knobY);
-                            const distPivot = Math.hypot(mx - hp.hpx, my - hp.hpy);
-                            const hitR = faucetGeom.handleLength * 0.65;
-                            if (distKnob < hitR * 0.7 || distPivot < hitR) {
-                                faucetCanvas.style.cursor = 'grab';
-                            } else {
-                                faucetCanvas.style.cursor = 'default';
-                            }
-                        }
-                    }
-                }
-            });
-            faucetCanvas.addEventListener('pointerup', () => {
-                isDraggingFaucet = false;
-                faucetCanvas.style.cursor = 'default';
-            });
-            faucetCanvas.addEventListener('pointerleave', () => {
-                isDraggingFaucet = false;
-                faucetCanvas.style.cursor = 'default';
-            });
-
-            // Keyboard controls
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    targetSliderValue = Math.min(1, targetSliderValue + 0.04);
-                    baseSlider.value = Math.round(targetSliderValue * 1000);
-                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    targetSliderValue = Math.max(0, targetSliderValue - 0.04);
-                    baseSlider.value = Math.round(targetSliderValue * 1000);
-                } else if (e.key === '0' || e.key === 'Home') {
-                    e.preventDefault();
-                    targetSliderValue = 0;
-                    baseSlider.value = 0;
-                } else if (e.key === '1' || e.key === 'End') {
-                    e.preventDefault();
-                    targetSliderValue = 1;
-                    baseSlider.value = 1000;
-                } else if (e.key === '5') {
-                    e.preventDefault();
-                    targetSliderValue = 0.5;
-                    baseSlider.value = 500;
-                }
-            });
-
-            // Resize observer
-            const resizeObserver = new ResizeObserver(() => {
-                resizeAll();
-            });
-            resizeObserver.observe(waterPanel);
-            resizeObserver.observe(transistorPanelEl);
-
-            window.addEventListener('resize', resizeAll);
-            window.addEventListener('orientationchange', () => {
-                setTimeout(resizeAll, 200);
-            });
-
-            // ─────────────────────────────────────
-            // Initialize
-            // ─────────────────────────────────────
-            resizeAll();
-            targetSliderValue = 0;
-            sliderValue = 0;
-            baseSlider.value = 0;
-            regionIndicator.textContent = 'CUTOFF';
-            regionIndicator.classList.add('cutoff');
-            waterReadout.textContent = 'Flow: 0.0 L/s';
-            transistorReadout.textContent = 'Ic: 0.00 mA';
-            lastTime = performance.now();
             requestAnimationFrame(render);
+        }
 
-            console.log('💧⚡ Transistor Faucet Analogy Demo ready!');
-            console.log('   Drag the slider or grab the faucet handle to explore.');
-            console.log('   Arrow keys, 0, 5, 1 also work.');
-            console.log('   Left: Faucet analogy  |  Right: NPN Transistor');
-            console.log('   Base current (handle) controls Collector-Emitter flow (water).');
-        })();
+        requestAnimationFrame(render);
     </script>
 </body>
 </html>
