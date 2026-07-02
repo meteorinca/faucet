@@ -1,181 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transistor Animation</title>
-    <style>
-        body {
-            background-color: #151515;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        .transistor-wrapper {
-            width: 100%;
-            max-width: 650px;
-            padding: 20px;
-        }
-
-        svg {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* Base styles for static elements */
-        .static-circle {
-            fill: none;
-            stroke: #8c8c8c;
-            stroke-width: 3;
-        }
-
-        .label {
-            fill: #ffffff;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .input-text { fill: #9b51e0; } /* Purple text */
-        .output-text { fill: #5dade2; } /* Blue text */
-        .value-text { font-family: monospace; font-size: 22px; }
-
-        /* --- State 0 (Solid Grey Lines) --- */
-        .state-0-lines {
-            stroke: #b0b0b0;
-            stroke-width: 9;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
-
-        .text-state-0 {
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
-
-        /* --- State 1 (Colored Dashed Lines) --- */
-        .state-1-lines {
-            stroke-width: 9;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .state-1-control {
-            stroke: #9b51e0; /* Purple */
-            stroke-dasharray: 8 12;
-        }
-
-        .state-1-inner {
-            stroke: #5dade2; /* Blue */
-            stroke-dasharray: 8 12;
-        }
-
-        .text-state-1 {
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        /* --- State Activation using Attribute Selector --- */
-        /* When state is 0 */
-        svg[data-state="0"] .state-0-lines { opacity: 1; }
-        svg[data-state="0"] .text-state-0 { opacity: 1; }
-        svg[data-state="0"] .state-1-lines { opacity: 0; }
-        svg[data-state="0"] .text-state-1 { opacity: 0; }
-
-        /* When state is 1 */
-        svg[data-state="1"] .state-0-lines { opacity: 0; }
-        svg[data-state="1"] .text-state-0 { opacity: 0; }
-        svg[data-state="1"] .state-1-lines { opacity: 1; }
-        svg[data-state="1"] .text-state-1 { opacity: 1; }
-
-        /* --- Dash Flow Animation for State 1 --- */
-        @keyframes flow {
-            to {
-                stroke-dashoffset: -20;
-            }
-        }
-
-        svg[data-state="1"] .state-1-control,
-        svg[data-state="1"] .state-1-inner {
-            animation: flow 0.8s linear infinite;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transistor Switch Animation</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <main class="app">
+    <section class="panel" id="transistorPanel">
+      <svg class="scene" viewBox="0 0 720 520" aria-label="Transistor animation">
+        <!-- Labels -->
+        <text x="86" y="180" class="label">Control</text>
+        <text x="95" y="218" class="label">wire</text>
 
-    <div class="transistor-wrapper">
-        <svg viewBox="0 0 600 500" class="transistor" data-state="0">
-            
-            <!-- Static Circle -->
-            <circle class="static-circle" cx="350" cy="250" r="90" />
+        <text x="485" y="70" class="label">Electrode</text>
+        <text x="500" y="445" class="label">Electrode</text>
 
-            <!-- STATE 0 LINES (Solid Grey) -->
-            <g class="state-0-lines">
-                <line x1="50" y1="250" x2="290" y2="250" /> <!-- Control Wire -->
-                <line x1="290" y1="190" x2="290" y2="310" /> <!-- Base Junction -->
-                <polyline points="290,190 340,140 440,100" /> <!-- Top Electrode -->
-                <polyline points="290,310 340,360 440,400" /> <!-- Bottom Electrode -->
-            </g>
+        <text x="48" y="315" class="value inputText">Input = 0</text>
+        <text x="210" y="470" class="value outputText">Output = 0</text>
 
-            <!-- STATE 1 LINES (Colored Dashed) -->
-            <g class="state-1-lines">
-                <!-- Control Wire (Purple) -->
-                <line class="state-1-control" x1="50" y1="250" x2="290" y2="250" />
-                <!-- Base Junction & Electrodes (Blue) -->
-                <line class="state-1-inner" x1="290" y1="190" x2="290" y2="310" />
-                <polyline class="state-1-inner" points="290,190 340,140 440,100" />
-                <polyline class="state-1-inner" points="290,310 340,360 440,400" />
-            </g>
+        <!-- Transistor circle -->
+        <circle cx="360" cy="245" r="132" class="outline" />
 
-            <!-- LABELS -->
-            <g class="label">
-                <!-- Control Text -->
-                <text x="160" y="170" text-anchor="middle">Control</text>
-                <text x="160" y="195" text-anchor="middle">wire</text>
+        <!-- Wire paths used for animation -->
+        <path id="inputPath" d="M 110 245 L 280 245" class="wire inputWire" />
 
-                <!-- Electrode Text -->
-                <text x="455" y="95" text-anchor="start">Electrode</text>
-                <text x="455" y="425" text-anchor="start">Electrode</text>
-            </g>
+        <path id="topPath" d="M 405 25 L 405 126 L 280 180" class="wire outputWire" />
+        <path id="middlePath" d="M 280 180 L 280 310" class="wire outputWire" />
+        <path id="bottomPath" d="M 280 310 L 405 372 L 405 500" class="wire outputWire" />
 
-            <!-- INPUT / OUTPUT DYNAMIC TEXT -->
-            <g font-size="24" font-weight="bold">
-                <!-- Input Line -->
-                <text x="50" y="360" text-anchor="start">
-                    <tspan class="input-text">Input = </tspan>
-                    <tspan class="value-text text-state-0 input-text">0</tspan>
-                    <tspan class="value-text text-state-1 input-text">1</tspan>
-                </text>
-                
-                <!-- Output Line -->
-                <text x="160" y="440" text-anchor="start">
-                    <tspan class="output-text">Output = </tspan>
-                    <tspan class="value-text text-state-0 output-text">0</tspan>
-                    <tspan class="value-text text-state-1 output-text">1</tspan>
-                </text>
-            </g>
-            
-        </svg>
-    </div>
+        <!-- Visible transistor body -->
+        <line x1="280" y1="170" x2="280" y2="320" class="wire bodyWire" />
+        <line x1="280" y1="180" x2="405" y2="126" class="wire bodyWire" />
+        <line x1="280" y1="310" x2="405" y2="372" class="wire bodyWire" />
+        <line x1="405" y1="25" x2="405" y2="126" class="wire bodyWire" />
+        <line x1="405" y1="372" x2="405" y2="500" class="wire bodyWire" />
 
-    <script>
-        // Simple logic to toggle the state every 2.5 seconds
-        const svgElement = document.querySelector('.transistor');
-        let currentState = 0;
+        <!-- Particle containers -->
+        <g id="inputParticles"></g>
+        <g id="outputParticles"></g>
+      </svg>
 
-        setInterval(() => {
-            currentState = currentState === 0 ? 1 : 0;
-            svgElement.setAttribute('data-state', currentState);
-        }, 2500);
-    </script>
+      <div class="controls">
+        <button id="toggleBtn">Turn Input On</button>
+        <button id="autoBtn" class="ghost">Auto Play</button>
+      </div>
+    </section>
+  </main>
 
+  <script src="app.js"></script>
 </body>
 </html>
